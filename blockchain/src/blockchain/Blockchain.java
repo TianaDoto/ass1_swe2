@@ -26,11 +26,16 @@ public class Blockchain {
 	
 	public void addBlock(Block b)
 	{
-		blockchain.add(b);
+		if(b.data.validateTransaction())
+			blockchain.add(b);
+		else
+			System.out.println("invalid transaction");
 	}
 	
 	public void read()
-	{}
+	{
+		
+	}
 	
 	public void write()
 	{

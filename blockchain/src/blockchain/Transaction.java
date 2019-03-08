@@ -6,18 +6,23 @@ public class Transaction {
 	public PublicKey sender; //Senders address/public key.
 	public PublicKey reciever;
 	public String transactionId;
+	public boolean state = false;
 	public float amount;
 	
-	public Transaction(PublicKey s,PublicKey r,float A) {
-		sender=s;
-		reciever=r;
+	public Transaction(Wallet s,Wallet r,float A) {
+		sender=s.publickey;
+		reciever=r.publickey;
+		
 		amount=A;
+		if(amount <= s.getBalance()) {
+			s.setBalance(s.getBalance()-A);
+			r.setBalance(r.getBalance()+A);
+			state= true;
+		}
+		else state= false;
 	}
 	
-	boolean validateTransaction(Wallet w) {
-		if(amount>= w.getBalance()) {
-			return true;
-		}
-		else return false;
+	boolean validateTransaction() {
+		return state;
 	}
 }

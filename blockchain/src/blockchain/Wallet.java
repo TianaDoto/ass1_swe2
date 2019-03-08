@@ -12,6 +12,20 @@ public class Wallet {
 		
 	}
 	
+	public void generateKeyPair() {
+		try {
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
+			SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+			keyGen.initialize(1024, random);
+			KeyPair pair = keyGen.generateKeyPair();
+			privatekey = pair.getPrivate();
+			publickey = pair.getPublic();
+	        
+		}catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	void Update(float amount) {
 		this.Balance-=amount;
 	}
@@ -27,5 +41,9 @@ public class Wallet {
 	}
 	public float getBalance() {
 		return this.Balance;
+	}
+	
+	public void setBalance(float b) {
+		this.Balance=b;
 	}
 }
