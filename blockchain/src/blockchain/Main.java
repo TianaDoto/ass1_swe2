@@ -1,12 +1,51 @@
 package blockchain;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 import com.google.gson.GsonBuilder;
+
+import blockchain.Client;
+import blockchain.Server;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Wallet a = new Wallet(100); //sender
+		//Initial Setup
+		File dir = new File(System.getProperty("user.home")+"/blockchain");
+		if (!dir.exists() || !dir.isDirectory()) {
+		   dir.setWritable(true);
+		   dir.mkdir();
+		}
+		
+		
+		//P2P Server
+		Server server = new Server();
+		Thread srv = new Thread(server);
+		srv.start();
+		
+		//P2P Client
+		Client  client = new Client();
+		Thread cln = new Thread(client);
+		cln.start();
+		
+		System.out.println("P2P Connection Started!");
+		
+		
+		// Wallet Retrieval
+		File wallet_file = new File(System.getProperty("user.home")+"/blockchain/wallet.json");
+		Wallet a = new Wallet(0);
+		if (!wallet_file.exists()) {
+			a = new Wallet(0); //sender
+			a.generateKeyPair();
+			a.writewallet();
+		}
+		else {
+			a.readwallet();
+		}
+		
+		//System.out.println(a.publickey);
+		/*
 		Wallet b = new Wallet(0); //receiver
 		a.generateKeyPair();
 		b.generateKeyPair();
@@ -26,6 +65,7 @@ public class Main {
 		
 		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(bc);
 		System.out.println(blockchainJson);
+		*/
 	}
 
 }
