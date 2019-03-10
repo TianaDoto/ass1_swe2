@@ -30,6 +30,7 @@ public class Options {
 				b.mine(4);
 				nbc.addBlock(b);
 				nbc.write();
+				wallet.writewallet();
 				System.out.println("Your Transaction is Completed");
 			}
 			else {
@@ -63,7 +64,11 @@ public class Options {
 			option_service();
 		}
 		else if(selection.equals("0")) {
-			return;
+			Blockchain bc = new Blockchain();
+			bc.read();
+			if(bc.isValid()) System.out.println("Valid Chain!");
+			else System.out.println("Invalid Chain!");
+			//return;
 		}
 		else {
 			System.out.println("Invalid Input");

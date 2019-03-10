@@ -55,7 +55,7 @@ public class Main {
 		Thread cln = new Thread(client);
 		cln.start();
 		
-		System.out.println("P2P Connection Started!");
+		System.out.println("P2P Connection Starting...");
 		
 		//option_service();
 		//System.out.println(blockchainJson);
