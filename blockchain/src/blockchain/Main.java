@@ -3,7 +3,11 @@ package blockchain;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Scanner;
+
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import blockchain.Client;
@@ -18,6 +22,28 @@ public class Main {
 		   dir.mkdir();
 		}
 		
+		// Wallet Retrieval
+		File wallet_file = new File(System.getProperty("user.home")+"/blockchain/wallet.json");
+		Wallet a = new Wallet(0);
+		if (!wallet_file.exists()) {
+			a = new Wallet(0); //sender
+			a.generateKeyPair();
+			a.writewallet();
+		}
+		else {
+			a.readwallet();
+		}
+		
+		//Genesis Block
+		File blockchain_file = new File(System.getProperty("user.home")+"/blockchain/blockchain.json");
+		if(!blockchain_file.exists()) {
+			Transaction init_transaction = new Transaction(a, 100);
+			Block c= new Block(init_transaction,"0");
+			c.mine(4);
+			Blockchain bc = new Blockchain();
+			bc.addBlock(c);
+			bc.write();
+		}
 		
 		//P2P Server
 		Server server = new Server();
@@ -31,41 +57,11 @@ public class Main {
 		
 		System.out.println("P2P Connection Started!");
 		
+		//option_service();
+		//System.out.println(blockchainJson);
 		
-		// Wallet Retrieval
-		File wallet_file = new File(System.getProperty("user.home")+"/blockchain/wallet.json");
-		Wallet a = new Wallet(0);
-		if (!wallet_file.exists()) {
-			a = new Wallet(0); //sender
-			a.generateKeyPair();
-			a.writewallet();
-		}
-		else {
-			a.readwallet();
-		}
-		
-		//System.out.println(a.publickey);
-		/*
-		Wallet b = new Wallet(0); //receiver
-		a.generateKeyPair();
-		b.generateKeyPair();
-		
-		Transaction t = new Transaction(a, b, 50);
-		Transaction t2 = new Transaction(a, b, 100);
-		
-		
-		System.out.println(t2.validateTransaction());
-		Block c= new Block(t,"0");
-		Block c2= new Block(t2, c.hash);
-		c.mine(4);
-		c2.mine(4);
-		Blockchain bc = new Blockchain();
-		bc.addBlock(c);
-		bc.addBlock(c2);
-		
-		String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(bc);
-		System.out.println(blockchainJson);
-		*/
+		//Blockchain blc = new Gson().fromJson(blockchainJson, Blockchain.class);
+		//System.out.println(blc.blockchain.get(blc.blockchain.size()-1).hash);
 	}
 
 }

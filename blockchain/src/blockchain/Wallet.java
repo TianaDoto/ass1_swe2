@@ -75,9 +75,29 @@ public class Wallet {
 		    Gson gson = new GsonBuilder().create();
 		    gson.toJson(wallet, writer);
 		} catch (IOException e) {
-			
+			System.out.print("Faild to update Wallet!");
 		}
 	}
+	
+	public float calculate_balance(Blockchain bc) {
+		float balance = 0.0f;
+		boolean transaction = false;
+		
+		for(int x=0; x<bc.blockchain.size(); x++) {
+			if(bc.blockchain.get(x).data.reciever.equals(this.publickey)) {
+				balance += bc.blockchain.get(x).data.amount;
+				transaction = true;
+			}
+			else if(bc.blockchain.get(x).data.sender.equals(this.publickey)){
+				balance -= bc.blockchain.get(x).data.amount;
+				transaction = true;
+			}
+		}
+		
+		if(transaction) return balance;
+		else return -1.0f;
+	}
+	
 	public float getBalance() {
 		return this.Balance;
 	}

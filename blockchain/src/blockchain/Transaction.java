@@ -22,6 +22,15 @@ public class Transaction {
 		else state= false;
 	}
 	
+	public Transaction(Wallet r,float A) {
+		sender="Initial Balance";
+		reciever=r.publickey;
+		
+		amount=A;
+		r.setBalance(r.getBalance()+A);
+		state= true;
+	}
+	
 	boolean validateTransaction() {
 		return state;
 	}

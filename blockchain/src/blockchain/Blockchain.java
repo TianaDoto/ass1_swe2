@@ -1,5 +1,15 @@
 package blockchain;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Base64;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 
 public class Blockchain {
@@ -32,14 +42,30 @@ public class Blockchain {
 			System.out.println("invalid transaction");
 	}
 	
-	public void read()
+	public Blockchain read()
 	{
-		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.home")+"/blockchain/blockchain.json"));
+			
+			Gson gson = new Gson();
+			Blockchain blockchain = gson.fromJson(br, Blockchain.class);
+			
+			this.blockchain = blockchain.blockchain;
+
+		} catch (FileNotFoundException e) {
+			System.out.println("Unable to read Blockchain!");
+		}
+		return this;
 	}
 	
 	public void write()
 	{
-		
+		try (Writer writer = new FileWriter(System.getProperty("user.home")+"/blockchain/blockchain.json")) {
+		    Gson gson = new GsonBuilder().create();
+		    gson.toJson(this, writer);
+		} catch (IOException e) {
+			System.out.print("Faild to update Blockchain!");
+		}
 	}
 	
 }

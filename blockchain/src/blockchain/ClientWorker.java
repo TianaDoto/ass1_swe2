@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import com.google.gson.Gson;
+
 public class ClientWorker implements Runnable {
 	private Socket client;
 	
@@ -31,12 +33,20 @@ public class ClientWorker implements Runnable {
 			  if(line.equals("publickey")) {
 				  Wallet w = new Wallet(0);
 				  w.readwallet();
-				  out.println(w.publickey);
+				  out.println("Public Key: "+w.publickey);
+			  }
+			  if(line.equals("blockchain")) {
+				  Blockchain bc = new Blockchain();
+				  bc.read();
+				  out.println(new Gson().toJson(bc));
+			  }
+			  if(line.equals("continue")) {
+				  continue;
 			  }
 			}
-			out.close(); // Flush and close the output stream
-	        in.close(); // Close the input stream
-	        client.close();
+//			out.close(); // Flush and close the output stream
+//	        in.close(); // Close the input stream
+//	        client.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
