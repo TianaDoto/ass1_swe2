@@ -1,10 +1,10 @@
 package blockchain;
 
-import java.security.*;
+
 
 public class Transaction {
-	public PublicKey sender; //Senders address/public key.
-	public PublicKey reciever;
+	public String sender; //Senders address/public key.
+	public String reciever;
 	public String transactionId;
 	public boolean state = false;
 	public float amount;

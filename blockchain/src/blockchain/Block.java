@@ -1,7 +1,6 @@
 package blockchain;
 
 import java.security.MessageDigest;
-import java.util.Base64;
 
 public class Block {
 	public static int index;
@@ -38,12 +37,17 @@ public class Block {
 		}
 	}
 	
+	public boolean equal(Block b)
+	{
+		if(!b.hash.equals(this.hash))
+			return false;
+		else
+			return true;
+	}
 	public String mine(int difficulty)
 	{
-		byte[] encodedFrom = data.sender.getEncoded();
-		byte[] encodedTo = data.reciever.getEncoded();
-		String b64From = Base64.getEncoder().encodeToString(encodedFrom);
-		String b64To = Base64.getEncoder().encodeToString(encodedTo);
+		String b64From = data.sender;
+		String b64To = data.reciever;
 		String beg = new String(new char[difficulty]).replace('\0', '0');
 		
 		do
