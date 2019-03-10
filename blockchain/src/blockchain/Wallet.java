@@ -1,11 +1,22 @@
 package blockchain;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Base64;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Wallet {
-	public PublicKey publickey;
-	private PrivateKey privatekey;
+	public String publickey;
+	private String privatekey;
 	private float Balance;
 	
 	public Wallet(float Balance) {
@@ -15,38 +26,82 @@ public class Wallet {
 	
 	public void generateKeyPair() {
 		try {
-			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECDSA","BC");
-			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-			ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
-			// Initialize the key generator and generate a KeyPair
-			keyGen.initialize(ecSpec, random); //256
-	        KeyPair keyPair = keyGen.generateKeyPair();
-	        //Set the public and private keys from the keyPair
-	        this.privatekey = keyPair.getPrivate();
-	        this.publickey = keyPair.getPublic();
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
+			SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+			keyGen.initialize(1024, random);
+			KeyPair pair = keyGen.generateKeyPair();
+			
+			Base64.Encoder encoder = Base64.getEncoder();
+			privatekey = encoder.encodeToString(pair.getPrivate().getEncoded());
+			publickey = encoder.encodeToString(pair.getPublic().getEncoded());
 	        
 		}catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
 	void Update(float amount) {
 		this.Balance-=amount;
 	}
 	
-	public Wallet readwallet() {
-		Wallet w= new Wallet(0);
-		//read Json process
-		return w;
+	public void readwallet() {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(System.getProperty("user.home")+"/blockchain/wallet.json"));
+			
+			Gson gson = new Gson();
+			ArrayList<String> walletJSON = gson.fromJson(br, ArrayList.class);
+			
+			this.publickey = walletJSON.get(0);
+			this.privatekey = walletJSON.get(1);
+			this.Balance = Float.parseFloat(walletJSON.get(2));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 	}
 	
-	public void writewallet(Wallet w) {
-		//process of writing w to Json file
+	public void writewallet() {
+		String encoded_publicKey = this.publickey;
+		String encoded_privateKey = this.privatekey;
+		
+		ArrayList<String> wallet = new ArrayList<String>();
+		wallet.add(encoded_publicKey);
+		wallet.add(encoded_privateKey);
+		wallet.add(String.valueOf(this.Balance));
+		
+		try (Writer writer = new FileWriter(System.getProperty("user.home")+"/blockchain/wallet.json")) {
+		    Gson gson = new GsonBuilder().create();
+		    gson.toJson(wallet, writer);
+		} catch (IOException e) {
+			System.out.print("Faild to update Wallet!");
+		}
 	}
 	
-	public PrivateKey getPrivateKey() {
-		return this.privatekey;
+	public float calculate_balance(Blockchain bc) {
+		float balance = 0.0f;
+		boolean transaction = false;
+		
+		for(int x=0; x<bc.blockchain.size(); x++) {
+			if(bc.blockchain.get(x).data.reciever.equals(this.publickey)) {
+				balance += bc.blockchain.get(x).data.amount;
+				transaction = true;
+			}
+			else if(bc.blockchain.get(x).data.sender.equals(this.publickey)){
+				balance -= bc.blockchain.get(x).data.amount;
+				transaction = true;
+			}
+		}
+		
+		if(transaction) return balance;
+		else return -1.0f;
 	}
+	
 	public float getBalance() {
 		return this.Balance;
+	}
+	
+	public void setBalance(float b) {
+		this.Balance=b;
 	}
 }
